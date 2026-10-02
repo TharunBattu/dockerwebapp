@@ -22,7 +22,7 @@ services:
 
   devopsdb:
     container_name: db-cont
-    build: Docker-db/Dockerfile
+    build: Docker-db/
     restart: unless-stopped
     volumes:
       - mysql-volume:/var/lib/mysql/
