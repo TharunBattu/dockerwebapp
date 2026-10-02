@@ -1,26 +1,48 @@
-version: "3.9"
-
+---
 services:
-  devopsdb:
-    image: shaikmustafa/deepika:db
+  app-service:
+    container_name: app-cont
+    build:
+      context: .
+      dockerfile: Docker-app/Dockerfile
+    restart: unless-stopped
     ports:
-      - "3306:3306"
-    deploy:
-      replicas: 1
-    networks:
-      - mynetwork
-
-  application:
-    image: shaikmustafa/deepika:app
-    ports:
-      - "1111:8080"
-    deploy:
-      replicas: 3
+      - "9000:8080"
     depends_on:
-      - devopsdb
-    networks:
-      - mynetwork
+      db-service:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.5"
+          memory: 100M
+        limits:
+          cpus: "1.0"
+          memory: 150M
 
-networks:
-  mynetwork:
-    driver: overlay
+  devopsdb:
+    container_name: db-cont
+    build: Docker-db/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - mysql-volume:/var/lib/mysql/
+    env_file:
+      - config.env 
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pdevopspassword"]
+      start_period: 30s
+      interval: 15s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.5"
+          memory: 100M
+        limits:
+          cpus: "1.0"
+          memory: 150M
+
+volumes:
+  mysql-volume:
+...
