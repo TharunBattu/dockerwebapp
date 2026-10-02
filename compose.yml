@@ -15,10 +15,10 @@ services:
       resources:
         reservations:
           cpus: "0.5"
-          memory: 100M
+          memory: 150M
         limits:
           cpus: "1.0"
-          memory: 150M
+          memory: 300M
 
   devopsdb:
     container_name: db-cont
